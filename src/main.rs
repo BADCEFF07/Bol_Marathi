@@ -1,8 +1,11 @@
+mod Scanner;
+
+use crate::Scanner::*;
 use std::env;
 use std::fs;
 use std::process::exit;
 use std::result::Result::Err;
-use std::io;
+use std::io::{self, BufRead, Write};
 
 
 fn run_file(path : &str) -> Result<(), String>{
@@ -18,20 +21,32 @@ fn run(_contents: &str) -> Result<(), String>{
   // Placeholder implementation
   return  Err("Not implemented yet".to_string());
 }
-//function to run the interactive prompt
+//function to run the interactive prompt,,,,,,
 fn run_prompt( )-> Result<(), String>{
   // Placeholder implementation
   println!("> ");
-  let mut buffer = String::new();
   let stdln = io::stdin();
-  stdln.read_line (&mut buffer){
+  match io::stdout().flush(){
     Ok(_) => (),
+    Err(_) => return Err("Could not flush stdout".to_string()),
+  } 
+  let mut buffer :String  = String::new();
+  let mut handle = stdln.lock();
+
+  match handle.read_line (&mut buffer){
+    Ok(n) => {
+      if n <=  1 {
+          return Ok(());
+      }
+    } ,
     Err(_) => return Err("Could not read line".to_string()),
   }
   println!("You wrote {}", buffer);
+  Ok(())
 }
 // Main function
 fn main(){
+  
   // Collect command line arguments
   let args: Vec<String> = env::args().collect();
     // Check the number of arguments
@@ -62,6 +77,4 @@ fn main(){
         },  
       }
     }
-  
-  
-}
+  }
